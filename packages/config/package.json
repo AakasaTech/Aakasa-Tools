@@ -1,0 +1,14 @@
+{
+  "name": "@aakasa/config",
+  "private": true,
+  "version": "0.0.0",
+  "main": "index.js",
+  "files": [
+    "eslint",
+    "tsconfig",
+    "tailwind"
+  ],
+  "devDependencies": {
+    "eslint-config-next": "14.2.35"
+  }
+}

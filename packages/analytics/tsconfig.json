@@ -1,0 +1,8 @@
+{
+  "extends": "@aakasa/config/tsconfig/base.json",
+  "compilerOptions": {
+    "lib": ["dom", "ES2022"],
+    "noEmit": true
+  },
+  "include": ["src"]
+}
