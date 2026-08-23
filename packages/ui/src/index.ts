@@ -18,3 +18,9 @@ export type { FileDropzoneProps } from './FileDropzone';
 
 export { BulkList } from './BulkList';
 export type { BulkListProps } from './BulkList';
+
+export { JsonTreeView, buildJsonTree } from './JsonTreeView';
+export type { JsonTreeViewProps, JsonTreeNode, JsonNodeType } from './JsonTreeView';
+
+export { Combobox } from './Combobox';
+export type { ComboboxProps, ComboboxOption } from './Combobox';

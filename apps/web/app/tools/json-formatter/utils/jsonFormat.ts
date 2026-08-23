@@ -221,58 +221,6 @@ export function getByteSize(text: string): number {
   return new TextEncoder().encode(text).length;
 }
 
-export type JsonNodeType = 'object' | 'array' | 'string' | 'number' | 'boolean' | 'null';
-
-export interface JsonTreeNode {
-  /** Property key or array index (stringified); null for the root node. */
-  key: string | null;
-  type: JsonNodeType;
-  /** Set for leaf nodes only — objects/arrays carry their data in `children`. */
-  value: string | number | boolean | null;
-  children?: JsonTreeNode[];
-}
-
-/** Converts a parsed JSON value into a plain tree structure for recursive rendering. */
-export function buildJsonTree(value: unknown, key: string | null = null): JsonTreeNode {
-  if (value === null) {
-    return { key, type: 'null', value: null };
-  }
-
-  if (Array.isArray(value)) {
-    return {
-      key,
-      type: 'array',
-      value: null,
-      children: value.map((item, index) => buildJsonTree(item, String(index))),
-    };
-  }
-
-  if (typeof value === 'object') {
-    return {
-      key,
-      type: 'object',
-      value: null,
-      children: Object.entries(value as Record<string, unknown>).map(([childKey, childValue]) =>
-        buildJsonTree(childValue, childKey)
-      ),
-    };
-  }
-
-  if (typeof value === 'string') {
-    return { key, type: 'string', value };
-  }
-
-  if (typeof value === 'number') {
-    return { key, type: 'number', value };
-  }
-
-  if (typeof value === 'boolean') {
-    return { key, type: 'boolean', value };
-  }
-
-  return { key, type: 'null', value: null };
-}
-
 export const SAMPLE_JSON = `{
   "name": "Aakasa Toolbox",
   "version": 1,

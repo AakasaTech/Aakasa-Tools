@@ -10,7 +10,7 @@ import {
   type ChangeEvent,
   type KeyboardEvent,
 } from 'react';
-import { Button, CopyButton } from '@aakasa/ui';
+import { Button, CopyButton, JsonTreeView } from '@aakasa/ui';
 import {
   formatJson,
   getByteSize,
@@ -19,7 +19,6 @@ import {
   SAMPLE_JSON,
   type IndentOption,
 } from './utils/jsonFormat';
-import { JsonTreeView } from './JsonTreeView';
 import type { FormatWorkerRequest, FormatWorkerResponse } from './workers/format.worker';
 
 const LARGE_INPUT_THRESHOLD_BYTES = 500_000;

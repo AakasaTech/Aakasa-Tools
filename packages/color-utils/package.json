@@ -1,0 +1,15 @@
+{
+  "name": "@aakasa/color-utils",
+  "private": true,
+  "version": "0.0.0",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@aakasa/config": "*",
+    "typescript": "5.9.3"
+  }
+}

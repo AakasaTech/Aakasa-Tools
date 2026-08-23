@@ -1,18 +1,75 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { buildJsonTree, type JsonTreeNode } from './utils/jsonFormat';
 
-// A container can hold thousands of entries (this tool is expected to handle
-// >500KB input). Rendering every child as a DOM node the moment its parent
-// expands can lock up the tab, so each level only ever renders this many
-// children up front — the rest stay off-DOM until explicitly requested.
+export type JsonNodeType = 'object' | 'array' | 'string' | 'number' | 'boolean' | 'null';
+
+export interface JsonTreeNode {
+  /** Property key or array index (stringified); null for the root node. */
+  key: string | null;
+  type: JsonNodeType;
+  /** Set for leaf nodes only — objects/arrays carry their data in `children`. */
+  value: string | number | boolean | null;
+  children?: JsonTreeNode[];
+}
+
+/** Converts a parsed JSON value into a plain tree structure for recursive rendering. */
+export function buildJsonTree(value: unknown, key: string | null = null): JsonTreeNode {
+  if (value === null) {
+    return { key, type: 'null', value: null };
+  }
+
+  if (Array.isArray(value)) {
+    return {
+      key,
+      type: 'array',
+      value: null,
+      children: value.map((item, index) => buildJsonTree(item, String(index))),
+    };
+  }
+
+  if (typeof value === 'object') {
+    return {
+      key,
+      type: 'object',
+      value: null,
+      children: Object.entries(value as Record<string, unknown>).map(([childKey, childValue]) =>
+        buildJsonTree(childValue, childKey)
+      ),
+    };
+  }
+
+  if (typeof value === 'string') {
+    return { key, type: 'string', value };
+  }
+
+  if (typeof value === 'number') {
+    return { key, type: 'number', value };
+  }
+
+  if (typeof value === 'boolean') {
+    return { key, type: 'boolean', value };
+  }
+
+  return { key, type: 'null', value: null };
+}
+
+// A container can hold thousands of entries (JSON Formatter and CSV↔JSON
+// Converter both expect >500KB input). Rendering every child as a DOM node
+// the moment its parent expands can lock up the tab, so each level only
+// ever renders this many children up front — the rest stay off-DOM until
+// explicitly requested.
 const MAX_VISIBLE_CHILDREN = 200;
 
 export interface JsonTreeViewProps {
   value: unknown;
 }
 
+/**
+ * Collapsible, virtualized-on-expand tree view for an arbitrary parsed JSON
+ * value. Pure presentational component — callers own parsing/validation and
+ * simply pass the already-parsed value in.
+ */
 export function JsonTreeView({ value }: JsonTreeViewProps) {
   const tree = useMemo(() => buildJsonTree(value), [value]);
 
