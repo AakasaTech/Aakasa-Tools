@@ -1,3 +1,4 @@
+import type { SVGProps } from 'react';
 import Link from 'next/link';
 import { CATEGORY_LABELS, CategoryIcon, LockIcon, TOOL_REGISTRY, type ToolCategory } from '@aakasa/tool-shell';
 
@@ -45,6 +46,12 @@ function HeroSection() {
   );
 }
 
+// Categories fulfilled by a separate, dedicated app rather than a route in
+// this repo's TOOL_REGISTRY — PDF tools live at PDFCraft, not app/tools/pdf-*.
+const EXTERNAL_CATEGORY_URLS: Partial<Record<ToolCategory, string>> = {
+  pdf: 'https://pdfcraft.aakasa.dev',
+};
+
 function CategorySection() {
   const counts = TOOL_REGISTRY.reduce<Partial<Record<ToolCategory, number>>>((acc, tool) => {
     acc[tool.category] = (acc[tool.category] ?? 0) + 1;
@@ -56,42 +63,74 @@ function CategorySection() {
   );
 
   const liveCategoryCount = categories.filter((category) => (counts[category] ?? 0) > 0).length;
+  const hasExternalCategory = categories.some((category) => EXTERNAL_CATEGORY_URLS[category]);
 
   return (
     <section className="mx-auto max-w-5xl px-6 py-12">
       <h2 className="font-display text-2xl font-semibold text-ink dark:text-paper">Building toward 100 tools</h2>
       <p className="mt-1 text-sm text-ink/60 dark:text-paper/60">
-        Across {categories.length} categories — {liveCategoryCount} live, the rest on the way.
+        Across {categories.length} categories — {liveCategoryCount} live here
+        {hasExternalCategory ? ', plus PDF tools at a dedicated app' : ''}, the rest on the way.
       </p>
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {categories.map((category) => {
           const count = counts[category] ?? 0;
           const isLive = count > 0;
-          const cardClasses = isLive
+          const externalUrl = EXTERNAL_CATEGORY_URLS[category];
+          const isAvailable = isLive || !!externalUrl;
+
+          const cardClasses = isAvailable
             ? 'flex flex-col gap-1 rounded-lg border border-accent/30 bg-accent/[0.06] p-4 transition-colors hover:border-accent/60'
             : 'flex flex-col gap-1 rounded-lg border border-dashed border-ink/15 p-4 dark:border-paper/15';
 
+          const statusText = isLive
+            ? `${count} tool${count === 1 ? '' : 's'} live`
+            : externalUrl
+              ? 'Available at PDFCraft'
+              : 'Coming soon';
+
           const content = (
             <>
-              <CategoryIcon
-                category={category}
-                className={isLive ? 'h-4 w-4 text-accent' : 'h-4 w-4 text-ink/40 dark:text-paper/40'}
-                aria-hidden
-              />
-              <div className={isLive ? 'text-sm font-medium text-ink dark:text-paper' : 'text-sm font-medium text-ink/70 dark:text-paper/70'}>
+              <div className="flex items-center gap-1.5">
+                <CategoryIcon
+                  category={category}
+                  className={isAvailable ? 'h-4 w-4 text-accent' : 'h-4 w-4 text-ink/40 dark:text-paper/40'}
+                  aria-hidden
+                />
+                {externalUrl && <ExternalLinkIcon className="ml-auto h-3 w-3 text-accent/60" aria-hidden />}
+              </div>
+              <div
+                className={
+                  isAvailable
+                    ? 'text-sm font-medium text-ink dark:text-paper'
+                    : 'text-sm font-medium text-ink/70 dark:text-paper/70'
+                }
+              >
                 {CATEGORY_LABELS[category]}
               </div>
-              <div className={isLive ? 'text-xs text-accent' : 'text-xs text-ink/40 dark:text-paper/40'}>
-                {isLive ? `${count} tool${count === 1 ? '' : 's'} live` : 'Coming soon'}
+              <div className={isAvailable ? 'text-xs text-accent' : 'text-xs text-ink/40 dark:text-paper/40'}>
+                {statusText}
               </div>
             </>
           );
 
-          return isLive ? (
-            <Link key={category} href={`/tools?category=${category}`} className={cardClasses}>
-              {content}
-            </Link>
-          ) : (
+          if (isLive) {
+            return (
+              <Link key={category} href={`/tools?category=${category}`} className={cardClasses}>
+                {content}
+              </Link>
+            );
+          }
+
+          if (externalUrl) {
+            return (
+              <a key={category} href={externalUrl} target="_blank" rel="noopener noreferrer" className={cardClasses}>
+                {content}
+              </a>
+            );
+          }
+
+          return (
             <div key={category} className={cardClasses}>
               {content}
             </div>
@@ -99,6 +138,16 @@ function CategorySection() {
         })}
       </div>
     </section>
+  );
+}
+
+function ExternalLinkIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} {...props}>
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+      <polyline points="15 3 21 3 21 9" />
+      <line x1="10" y1="14" x2="21" y2="3" />
+    </svg>
   );
 }
 
