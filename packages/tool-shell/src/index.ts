@@ -10,4 +10,4 @@ export { RelatedToolsRail } from './RelatedToolsRail';
 export { TOOL_REGISTRY, CATEGORY_LABELS } from './registry';
 export type { ToolMeta, ToolCategory } from './registry';
 
-export { LockIcon } from './icons';
+export { LockIcon, CategoryIcon } from './icons';

@@ -1,11 +1,10 @@
 import Link from 'next/link';
-import { CATEGORY_LABELS, LockIcon, RelatedToolsRail, TOOL_REGISTRY, type ToolCategory } from '@aakasa/tool-shell';
+import { CATEGORY_LABELS, CategoryIcon, LockIcon, TOOL_REGISTRY, type ToolCategory } from '@aakasa/tool-shell';
 
 export default function HomePage() {
   return (
     <>
       <HeroSection />
-      <LiveToolsSection />
       <CategorySection />
       <WhySection />
       <CtaSection />
@@ -46,22 +45,6 @@ function HeroSection() {
   );
 }
 
-function LiveToolsSection() {
-  return (
-    <section className="mx-auto max-w-5xl px-6 py-12">
-      <div className="mb-6 flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="font-display text-2xl font-semibold text-ink dark:text-paper">
-          {TOOL_REGISTRY.length} tool{TOOL_REGISTRY.length === 1 ? '' : 's'} live today
-        </h2>
-        <Link href="/tools" className="text-sm hover:text-accent">
-          View all &rarr;
-        </Link>
-      </div>
-      <RelatedToolsRail tools={TOOL_REGISTRY} />
-    </section>
-  );
-}
-
 function CategorySection() {
   const counts = TOOL_REGISTRY.reduce<Partial<Record<ToolCategory, number>>>((acc, tool) => {
     acc[tool.category] = (acc[tool.category] ?? 0) + 1;
@@ -72,39 +55,45 @@ function CategorySection() {
     (a, b) => (counts[b] ?? 0) - (counts[a] ?? 0)
   );
 
+  const liveCategoryCount = categories.filter((category) => (counts[category] ?? 0) > 0).length;
+
   return (
     <section className="mx-auto max-w-5xl px-6 py-12">
-      <h2 className="font-display text-2xl font-semibold text-ink dark:text-paper">
-        Building toward 100 tools
-      </h2>
+      <h2 className="font-display text-2xl font-semibold text-ink dark:text-paper">Building toward 100 tools</h2>
       <p className="mt-1 text-sm text-ink/60 dark:text-paper/60">
-        Across 8 categories — one is live, the rest are on the way.
+        Across {categories.length} categories — {liveCategoryCount} live, the rest on the way.
       </p>
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {categories.map((category) => {
           const count = counts[category] ?? 0;
           const isLive = count > 0;
-          return (
-            <div
-              key={category}
-              className={
-                isLive
-                  ? 'rounded-lg border border-accent/30 bg-accent/[0.06] p-4'
-                  : 'rounded-lg border border-dashed border-ink/15 p-4 dark:border-paper/15'
-              }
-            >
-              <div
-                className={
-                  isLive
-                    ? 'text-sm font-medium text-ink dark:text-paper'
-                    : 'text-sm font-medium text-ink/70 dark:text-paper/70'
-                }
-              >
+          const cardClasses = isLive
+            ? 'flex flex-col gap-1 rounded-lg border border-accent/30 bg-accent/[0.06] p-4 transition-colors hover:border-accent/60'
+            : 'flex flex-col gap-1 rounded-lg border border-dashed border-ink/15 p-4 dark:border-paper/15';
+
+          const content = (
+            <>
+              <CategoryIcon
+                category={category}
+                className={isLive ? 'h-4 w-4 text-accent' : 'h-4 w-4 text-ink/40 dark:text-paper/40'}
+                aria-hidden
+              />
+              <div className={isLive ? 'text-sm font-medium text-ink dark:text-paper' : 'text-sm font-medium text-ink/70 dark:text-paper/70'}>
                 {CATEGORY_LABELS[category]}
               </div>
-              <div className={isLive ? 'mt-1 text-xs text-accent' : 'mt-1 text-xs text-ink/40 dark:text-paper/40'}>
+              <div className={isLive ? 'text-xs text-accent' : 'text-xs text-ink/40 dark:text-paper/40'}>
                 {isLive ? `${count} tool${count === 1 ? '' : 's'} live` : 'Coming soon'}
               </div>
+            </>
+          );
+
+          return isLive ? (
+            <Link key={category} href={`/tools?category=${category}`} className={cardClasses}>
+              {content}
+            </Link>
+          ) : (
+            <div key={category} className={cardClasses}>
+              {content}
             </div>
           );
         })}
