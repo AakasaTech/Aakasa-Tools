@@ -34,7 +34,7 @@ export default function Base64ToolPage() {
       description="Encode and decode Base64 — text, files, or images — entirely in your browser."
       category="developer"
       tier="free"
-      relatedTools={['json-formatter', 'uuid-hash-generator', 'url-encoder']}
+      relatedTools={['json-formatter', 'uuid-hash-generator', 'url-encoder-decoder']}
       faq={[
         {
           question: 'What is Base64, and why use it?',

@@ -17,6 +17,7 @@
     "@types/papaparse": "^5.5.2",
     "@types/qrcode": "^1.5.5",
     "browser-image-compression": "^2.0.2",
+    "cron-parser": "^5.10.0",
     "fflate": "^0.8.3",
     "next": "14.2.35",
     "papaparse": "^5.6.0",
