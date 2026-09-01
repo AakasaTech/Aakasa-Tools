@@ -16,6 +16,17 @@ const nextConfig = {
       // anything this app actually calls.
       config.resolve.fallback = { ...config.resolve.fallback, fs: false };
     }
+    // onnxruntime-web (a dependency of @imgly/background-removal) ships
+    // browser .mjs files that use `import.meta.url` and dynamic import()
+    // without declaring "type": "module" in its package.json — webpack
+    // then parses them in an ambiguous/CJS context where import.meta is a
+    // syntax error. `fullySpecified: false` + explicit ESM parsing for
+    // .mjs is the standard interop fix for this exact class of package.
+    config.module.rules.push({
+      test: /\.mjs$/,
+      type: 'javascript/auto',
+      resolve: { fullySpecified: false },
+    });
     return config;
   },
 };

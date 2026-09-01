@@ -34,7 +34,7 @@ export default function ImageCompressorPage() {
       description="Compress JPG, PNG, and WebP images — right in your browser, nothing uploaded."
       category="image"
       tier="free"
-      relatedTools={[]}
+      relatedTools={['format-converter', 'image-resizer']}
       faq={[
         {
           question: 'Does this actually make images smaller without losing quality?',

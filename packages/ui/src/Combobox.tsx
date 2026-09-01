@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 
 export interface ComboboxOption {
   value: string;
@@ -15,6 +15,13 @@ export interface ComboboxProps {
   ariaLabel: string;
   placeholder?: string;
   className?: string;
+  /** Custom rendering for each dropdown option's content — e.g. Font
+   * Pairing Previewer renders each option in its own font so users can
+   * browse by eye, not just by name. Defaults to plain `option.label`;
+   * the closed input always shows the plain label regardless (an <input>
+   * value can't render rich content), so this only affects the open
+   * listbox. */
+  renderOption?: (option: ComboboxOption) => ReactNode;
 }
 
 /**
@@ -25,7 +32,7 @@ export interface ComboboxProps {
  * lists today; a future Currency Converter's ~150-currency list is exactly
  * the case this was built for).
  */
-export function Combobox({ options, value, onChange, ariaLabel, placeholder = 'Search…', className = '' }: ComboboxProps) {
+export function Combobox({ options, value, onChange, ariaLabel, placeholder = 'Search…', className = '', renderOption }: ComboboxProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [highlightedIndex, setHighlightedIndex] = useState(0);
@@ -149,7 +156,7 @@ export function Combobox({ options, value, onChange, ariaLabel, placeholder = 'S
                     : 'text-ink/80 dark:text-paper/80'
                 } ${option.value === value ? 'font-medium' : ''}`}
               >
-                {option.label}
+                {renderOption ? renderOption(option) : option.label}
               </li>
             ))
           )}
