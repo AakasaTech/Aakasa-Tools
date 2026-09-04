@@ -1,6 +1,26 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { ThemeToggle } from './ThemeToggle';
 import './globals.css';
+
+// Runs before the body paints, synchronously — a plain inline script tag is
+// the only way to apply the right theme class before first render without
+// a flash of the wrong theme. Reads the same "theme" localStorage key
+// ThemeToggle writes to; falls back to the OS preference, then light, if
+// nothing is stored yet or storage is unavailable. Kept as a plain string
+// (not a template literal with interpolation) since it's static, trusted
+// code, never influenced by request data.
+const THEME_INIT_SCRIPT = `
+(function () {
+  try {
+    var stored = localStorage.getItem('theme');
+    var theme = stored === 'light' || stored === 'dark'
+      ? stored
+      : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (theme === 'dark') document.documentElement.classList.add('dark');
+  } catch (e) {}
+})();
+`;
 
 export const metadata: Metadata = {
   title: 'Aakasa Toolbox',
@@ -23,16 +43,30 @@ const AAKASA_PRODUCTS: { label: string; description: string; href: string | null
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning>
       <body className="flex min-h-screen flex-col bg-paper font-body text-ink dark:bg-ink dark:text-paper">
+        {/* eslint-disable-next-line @next/next/no-sync-scripts -- deliberate: must run synchronously, before first paint, to set the theme class without a flash of the wrong theme; see THEME_INIT_SCRIPT comment above */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <header className="border-b border-ink/10 dark:border-paper/10">
           <nav className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
             <Link href="/" className="font-display text-lg font-semibold">
               Aakasa Toolbox
             </Link>
-            <Link href="/tools" className="text-sm hover:text-accent">
-              Tools
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link href="/tools" className="text-sm hover:text-accent">
+                Tools
+              </Link>
+              <a href="https://www.buymeacoffee.com/aakasatools" target="_blank" rel="noopener noreferrer" className="inline-flex">
+                {/* eslint-disable-next-line @next/next/no-img-element -- a fixed-size external badge image, not a page asset Next's image optimizer needs to process */}
+                <img
+                  src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+                  alt="Buy me a coffee"
+                  width={114}
+                  height={32}
+                />
+              </a>
+              <ThemeToggle />
+            </div>
           </nav>
         </header>
 
@@ -92,18 +126,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </div>
         </footer>
-
-        {/* Buy Me a Coffee — the static button embed, not the floating
-            widget script: the widget always renders as a fixed-position
-            corner button regardless of where its script tag sits in the
-            DOM, which isn't placeable inline. This is a plain image link,
-            so it sits in normal document flow right where it's put. */}
-        <div className="border-t border-ink/10 py-6 text-center dark:border-paper/10">
-          <a href="https://www.buymeacoffee.com/aakasatools" target="_blank" rel="noopener noreferrer" className="inline-block">
-            {/* eslint-disable-next-line @next/next/no-img-element -- a fixed-size external badge image, not a page asset Next's image optimizer needs to process */}
-            <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy me a coffee" width={174} height={49} />
-          </a>
-        </div>
       </body>
     </html>
   );
