@@ -92,6 +92,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </div>
         </footer>
+
+        {/* Buy Me a Coffee — the static button embed, not the floating
+            widget script: the widget always renders as a fixed-position
+            corner button regardless of where its script tag sits in the
+            DOM, which isn't placeable inline. This is a plain image link,
+            so it sits in normal document flow right where it's put. */}
+        <div className="border-t border-ink/10 py-6 text-center dark:border-paper/10">
+          <a href="https://www.buymeacoffee.com/aakasatools" target="_blank" rel="noopener noreferrer" className="inline-block">
+            {/* eslint-disable-next-line @next/next/no-img-element -- a fixed-size external badge image, not a page asset Next's image optimizer needs to process */}
+            <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy me a coffee" width={174} height={49} />
+          </a>
+        </div>
       </body>
     </html>
   );

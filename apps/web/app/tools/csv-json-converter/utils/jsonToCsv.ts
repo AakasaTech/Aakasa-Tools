@@ -294,25 +294,16 @@ function flattenRow(row: unknown, separator: string): FlatRow {
   return out;
 }
 
-export function jsonToCsv(jsonText: string, options: JsonToCsvOptions): JsonToCsvResult {
-  if (!jsonText.trim()) {
-    return { data: '', error: 'No JSON data to convert.' };
-  }
-
-  const parsed = parseJsonInput(jsonText);
-  if (!parsed.success) {
-    return {
-      data: '',
-      error: `Line ${parsed.error.line}, column ${parsed.error.column}: ${parsed.error.message}`,
-    };
-  }
-
-  // A bare object converts as a single-row CSV; an array converts as one
-  // row per element (the common case).
-  const rows: unknown[] = Array.isArray(parsed.value) ? parsed.value : [parsed.value];
-
+/**
+ * Converts an already-in-memory array of row objects to CSV — the shared
+ * core `jsonToCsv` below uses after parsing JSON text. Exported separately
+ * so callers that already have row objects (e.g. Random Data Generator's
+ * generated records) can reuse this flattening + serialization logic
+ * without a wasteful stringify-then-reparse round trip through JSON text.
+ */
+export function rowsToCsv(rows: unknown[], options: JsonToCsvOptions): JsonToCsvResult {
   if (rows.length === 0) {
-    return { data: '', error: 'JSON array is empty — nothing to convert.' };
+    return { data: '', error: 'No rows to convert.' };
   }
 
   const flatRows = rows.map((row) => flattenRow(row, options.arrayJoinSeparator));
@@ -339,6 +330,30 @@ export function jsonToCsv(jsonText: string, options: JsonToCsvOptions): JsonToCs
     data: csv,
     stats: { rowCount: rowsAsArrays.length, columnCount: headers.length },
   };
+}
+
+export function jsonToCsv(jsonText: string, options: JsonToCsvOptions): JsonToCsvResult {
+  if (!jsonText.trim()) {
+    return { data: '', error: 'No JSON data to convert.' };
+  }
+
+  const parsed = parseJsonInput(jsonText);
+  if (!parsed.success) {
+    return {
+      data: '',
+      error: `Line ${parsed.error.line}, column ${parsed.error.column}: ${parsed.error.message}`,
+    };
+  }
+
+  // A bare object converts as a single-row CSV; an array converts as one
+  // row per element (the common case).
+  const rows: unknown[] = Array.isArray(parsed.value) ? parsed.value : [parsed.value];
+
+  if (rows.length === 0) {
+    return { data: '', error: 'JSON array is empty — nothing to convert.' };
+  }
+
+  return rowsToCsv(rows, options);
 }
 
 export const SAMPLE_JSON_FOR_CSV = `[
