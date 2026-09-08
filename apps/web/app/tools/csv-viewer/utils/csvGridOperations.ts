@@ -12,7 +12,7 @@
  */
 
 import Papa from 'papaparse';
-import { csvToJson } from '../../csv-json-converter/utils/csvToJson';
+import { csvToJson } from '@aakasa/csv-utils';
 
 export interface CsvGridData {
   headers: string[];
@@ -26,12 +26,12 @@ export interface ParseCsvGridResult {
 }
 
 /**
- * Parses raw CSV/TSV text into grid data by reusing CSV↔JSON Converter's
- * `csvToJson` wrapper around PapaParse — deliberately not a second PapaParse
- * integration. Delimiter is auto-detected (covers comma, tab, semicolon,
- * pipe) and type inference is off so every cell stays the exact string it
- * was in the source file (a numeric-looking ID like "0042" must round-trip
- * unchanged through edit + re-export).
+ * Parses raw CSV/TSV text into grid data by reusing the shared
+ * `@aakasa/csv-utils` `csvToJson` wrapper around PapaParse — deliberately
+ * not a second PapaParse integration. Delimiter is auto-detected (covers
+ * comma, tab, semicolon, pipe) and type inference is off so every cell
+ * stays the exact string it was in the source file (a numeric-looking ID
+ * like "0042" must round-trip unchanged through edit + re-export).
  */
 export function parseCsvGrid(csvText: string): ParseCsvGridResult {
   const result = csvToJson(csvText, {

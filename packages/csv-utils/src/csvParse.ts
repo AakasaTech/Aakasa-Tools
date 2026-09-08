@@ -2,7 +2,14 @@
  * Pure CSV→JSON logic — no DOM, no React. Wraps PapaParse (hand-rolled CSV
  * parsing reliably breaks on quoted commas, embedded newlines, and escaped
  * quotes, so this deliberately doesn't reimplement that). Safe to call from
- * the main thread or from convert.worker.ts.
+ * the main thread or from a Web Worker.
+ *
+ * Shared across every tool that touches CSV parsing (CSV↔JSON Converter,
+ * CSV Viewer & Cleaner, CSV to Excel Converter, CSV & JSON Data Merger) —
+ * consolidated here once a 4th consumer made the original per-tool
+ * relative-import pattern (`../csv-json-converter/utils/csvToJson`, at two
+ * different relative depths depending on the importer) worth replacing
+ * with a stable package path.
  */
 
 import Papa from 'papaparse';

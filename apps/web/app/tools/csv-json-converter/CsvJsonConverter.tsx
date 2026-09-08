@@ -9,7 +9,7 @@ import {
   type CsvDelimiter,
   type CsvOutputShape,
   type CsvParseOptions,
-} from './utils/csvToJson';
+} from '@aakasa/csv-utils';
 import { jsonToCsv, SAMPLE_JSON_FOR_CSV, type JsonToCsvOptions } from './utils/jsonToCsv';
 import type { ConvertWorkerRequest, ConvertWorkerResponse } from './workers/convert.worker';
 

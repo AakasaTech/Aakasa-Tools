@@ -1,4 +1,4 @@
-import { csvToJson, type CsvParseOptions, type CsvToJsonResult } from '../utils/csvToJson';
+import { csvToJson, type CsvParseOptions, type CsvToJsonResult } from '@aakasa/csv-utils';
 import { jsonToCsv, type JsonToCsvOptions, type JsonToCsvResult } from '../utils/jsonToCsv';
 
 export type ConvertWorkerRequest =
