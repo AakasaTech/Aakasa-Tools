@@ -304,8 +304,13 @@ export function CollageMaker() {
                 {t.cells.map((cell, i) => (
                   <div
                     key={i}
-                    className="absolute rounded-[1px] bg-ink/30 dark:bg-paper/40"
-                    style={{ left: `${cell.x * 100}%`, top: `${cell.y * 100}%`, width: `${cell.width * 100}%`, height: `${cell.height * 100}%`, margin: 1 }}
+                    className="absolute rounded-[1px] border border-ink/25 bg-ink/40 dark:border-paper/30 dark:bg-paper/50"
+                    style={{
+                      left: `calc(${cell.x * 100}% + 1px)`,
+                      top: `calc(${cell.y * 100}% + 1px)`,
+                      width: `calc(${cell.width * 100}% - 2px)`,
+                      height: `calc(${cell.height * 100}% - 2px)`,
+                    }}
                   />
                 ))}
               </div>
